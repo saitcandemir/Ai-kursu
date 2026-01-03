@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ai Pazar - Dijital Vicdan v27 (Otomatik Model Seçici)</title>
+    <title>Ai Pazar - Dijital Vicdan v27 (Nokta Atışı)</title>
     <style>
         :root { --primary: #4285f4; --bg: #121212; --card: #1e1e1e; --text: #e0e0e0; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); text-align: center; padding: 20px; }
-        .container { background: var(--card); display: inline-block; padding: 40px; border-radius: 30px; border: 2px solid var(--primary); max-width: 600px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,0.7); margin-top: 30px; }
+        .container { background: var(--card); display: inline-block; padding: 40px; border-radius: 30px; border: 2px solid var(--primary); max-width: 600px; width: 95%; box-shadow: 0 20px 50px rgba(0,0,0,0.7); margin-top: 30px; }
         h1 { color: var(--primary); margin-bottom: 5px; font-size: 26px; text-transform: uppercase; }
-        #status { color: #f1c40f; margin: 15px 0; font-size: 15px; min-height: 24px; font-weight: bold; }
+        #status { color: #f1c40f; margin: 15px 0; font-size: 15px; font-weight: bold; }
         .mic-btn { background: var(--primary); color: white; width: 80px; height: 80px; border-radius: 50%; font-size: 35px; border: none; cursor: pointer; transition: 0.3s; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(66,133,244,0.3); }
-        .mic-btn:active { transform: scale(0.9); background: #ea4335; }
         .input-group { display: flex; gap: 10px; margin-top: 20px; }
         input[type="text"] { flex: 1; padding: 15px; border-radius: 12px; border: 1px solid #333; background: #2b2b2b; color: white; outline: none; }
         .send-btn { background: #34a853; color: white; padding: 0 25px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; }
@@ -22,9 +21,8 @@
 <body>
 
 <div class="container">
-    <h1>sait  Ai Pazar Canlı</h1>
-    <p style="font-size: 12px; color: #888;">Dijital Vicdan v27 - Çoklu Model Tarayıcı</p>
-    <div id="status">Sistem hazır, saitbey...</div>
+    <h1>🚀 Ai Pazar Canlı</h1>
+    <div id="status">Bedava Sistem Aktif...</div>
     
     <button id="startBtn" class="mic-btn">🎙️</button>
 
@@ -33,13 +31,13 @@
         <button id="sendBtn" class="send-btn">GÖNDER</button>
     </div>
 
-    <div id="aiResponse">Gemini cevabı burada görünecek...</div>
+    <div id="aiResponse">Cevap burada görünecek...</div>
     <div id="errorLog"></div>
 </div>
 
 <script>
-    // API ANAHTARINI BURAYA YAZ
-    var API_KEY = "AIzaSyD3HjshxdvUak27pgBsHVEMGGBjhYvGzS4"; 
+    // BURAYA API ANAHTARINI KOY (Boşluk bırakmadan yapıştır)
+    var API_KEY = "AIzaSyAxmSqsLPuVSJx6bO5_zqTgHKg-lREllY4"; 
 
     var startBtn = document.getElementById('startBtn');
     var sendBtn = document.getElementById('sendBtn');
@@ -50,19 +48,17 @@
 
     function showLog(msg) {
         errorLog.style.display = "block";
-        errorLog.innerHTML += "<div>• " + msg + "</div>";
+        errorLog.innerHTML = "⚠️ <b>Hata:</b> " + msg;
     }
 
-    // SES TANIMA
     var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
         var recognition = new SpeechRecognition();
         recognition.lang = 'tr-TR';
         startBtn.onclick = function() {
             errorLog.style.display = "none";
-            errorLog.innerHTML = "";
             recognition.start();
-            statusText.innerText = "Dinliyorum...";
+            statusText.innerText = "Seni dinliyorum...";
         };
         recognition.onresult = function(event) {
             var text = event.results[0][0].transcript;
@@ -74,55 +70,39 @@
     sendBtn.onclick = function() { if (userInput.value.trim() !== "") askGemini(userInput.value); };
 
     async function askGemini(soru) {
-        statusText.innerText = "Modeller taranıyor, lütfen bekleyin...";
-        aiResponse.innerText = "Bağlantı kuruluyor...";
+        statusText.innerText = "Gemini'ye bağlanılıyor...";
+        aiResponse.innerText = "Düşünüyor...";
         errorLog.style.display = "none";
-        errorLog.innerHTML = "";
 
-        // DENENECEK YOLLAR VE MODELLER
-        var versiyonlar = ["v1beta", "v1"];
-        var modeller = ["gemini-1.5-flash", "gemini-1.5-flash-8b", "gemini-pro"];
+        // GÜNCELLENEN NOKTA ATIŞI URL (gemini-1.5-flash-latest)
+        var apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=" + API_KEY;
         
-        var basarili = false;
+        try {
+            var response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: soru }] }] })
+            });
 
-        for (var v of versiyonlar) {
-            for (var m of modeller) {
-                if (basarili) break;
+            var data = await response.json();
 
-                var denemeUrl = "https://generativelanguage.googleapis.com/" + v + "/models/" + m + ":generateContent?key=" + API_KEY;
-                
-                try {
-                    console.log("Deneniyor: " + v + " - " + m);
-                    var response = await fetch(denemeUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ contents: [{ parts: [{ text: soru }] }] })
-                    });
-
-                    var data = await response.json();
-
-                    if (!data.error && data.candidates) {
-                        var reply = data.candidates[0].content.parts[0].text;
-                        aiResponse.innerText = reply;
-                        statusText.innerText = "Çalışan Model Bulundu: " + m + " (" + v + ")";
-                        
-                        var utter = new SpeechSynthesisUtterance(reply);
-                        utter.lang = 'tr-TR';
-                        window.speechSynthesis.speak(utter);
-                        basarili = true;
-                    } else {
-                        showLog(v + "/" + m + " başarısız: " + (data.error ? data.error.message : "Yanıt yok"));
-                    }
-                } catch (err) {
-                    showLog(v + "/" + m + " bağlantı hatası.");
-                }
+            if (data.error) {
+                showLog(data.error.message);
+                aiResponse.innerText = "Kapı hala açılmadı.";
+                return;
             }
-        }
 
-        if (!basarili) {
-            statusText.innerText = "Maalesef kapılar kapalı.";
-            aiResponse.innerText = "Hiçbir model anahtarınızla eşleşmedi.";
-            showLog("Lütfen API anahtarınızı ve Google AI Studio izinlerini kontrol edin.");
+            if (data.candidates && data.candidates[0]) {
+                var reply = data.candidates[0].content.parts[0].text;
+                aiResponse.innerText = reply;
+                statusText.innerText = "BAŞARDIK! Yanıt geldi.";
+                
+                var utter = new SpeechSynthesisUtterance(reply);
+                utter.lang = 'tr-TR';
+                window.speechSynthesis.speak(utter);
+            }
+        } catch (err) {
+            showLog("Bağlantı koptu. İnterneti kontrol et.");
         }
     }
 </script>
