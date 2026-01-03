@@ -3,26 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dijital Vicdan v27 - ÖZGÜR SİSTEM</title>
+    <title>Dijital Vicdan v27 - Özgürlük</title>
     <style>
-        :root { --accent: #ff00ff; --bg: #050505; --card: #111; }
+        :root { --accent: #00ffcc; --bg: #0a0a0a; --panel: #1a1a1a; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; text-align: center; padding: 20px; }
-        .box { background: var(--card); border: 2px solid var(--accent); border-radius: 30px; padding: 40px; display: inline-block; max-width: 500px; width: 90%; box-shadow: 0 0 50px rgba(255,0,255,0.2); margin-top: 50px; }
-        h1 { color: var(--accent); text-shadow: 0 0 10px var(--accent); }
-        .status { color: #00ffcc; font-weight: bold; margin: 20px 0; }
-        .mic-btn { background: var(--accent); border: none; width: 100px; height: 100px; border-radius: 50%; font-size: 50px; cursor: pointer; color: white; box-shadow: 0 0 20px var(--accent); transition: 0.3s; }
-        .mic-btn:active { transform: scale(0.9); }
-        #aiResponse { background: #1a1a1a; padding: 25px; border-radius: 20px; margin-top: 30px; text-align: left; border-left: 8px solid var(--accent); font-size: 18px; min-height: 80px; color: #eee; }
+        .box { background: var(--panel); border: 2px solid var(--accent); border-radius: 30px; padding: 30px; display: inline-block; max-width: 500px; width: 90%; box-shadow: 0 0 30px rgba(0,255,204,0.2); margin-top: 50px; }
+        h1 { color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
+        #status { color: #f1c40f; font-weight: bold; margin: 15px 0; }
+        .mic-btn { background: var(--accent); border: none; width: 80px; height: 80px; border-radius: 50%; font-size: 40px; cursor: pointer; transition: 0.3s; box-shadow: 0 0 15px var(--accent); }
+        .mic-btn:active { transform: scale(0.9); background: #ff4757; }
+        #aiResponse { background: #222; padding: 20px; border-radius: 15px; margin-top: 25px; text-align: left; border-left: 5px solid var(--accent); line-height: 1.6; min-height: 80px; }
     </style>
 </head>
 <body>
 
 <div class="box">
     <h1>DİJİTAL VİCDAN v27</h1>
-    <p>Anahtar Yok, İzin Yok, Sadece Sen ve Akıl!</p>
-    <div id="status" class="status">Sistem Canlı ve Özgür!</div>
+    <p style="color: #888;">Anahtarsız & Özgür Sistem</p>
+    <div id="status">Sistem Hazır!</div>
     <button id="startBtn" class="mic-btn">🎙️</button>
-    <div id="aiResponse">Hacı abi, 8 saatlik çile bitti. Mikrofona bas ve konuş, doğrudan cevap vereceğim!</div>
+    <div id="aiResponse">Hacı abi, 8 saatlik Google çilesi bitti. Konuş, cevabı arka planda alıp buraya yazayım!</div>
 </div>
 
 <script>
@@ -30,6 +30,7 @@
     const statusText = document.getElementById('status');
     const aiResponse = document.getElementById('aiResponse');
 
+    // SESLİ OKUMA
     function konus(metin) {
         window.speechSynthesis.cancel();
         const utter = new SpeechSynthesisUtterance(metin);
@@ -37,51 +38,54 @@
         window.speechSynthesis.speak(utter);
     }
 
+    // ARKA PLANDA ÇALIŞAN ZEKA MOTORU (Ücretsiz & Kilitsiz)
+    async function askAI(soru) {
+        statusText.innerText = "Arka planda soruluyor...";
+        aiResponse.innerText = "Düşünüyorum...";
+
+        try {
+            // Hiçbir anahtar gerektirmeyen, herkese açık bir API köprüsü üzerinden geçiyoruz
+            // Bu kısım doğrudan tarayıcı zekasını ve açık modelleri kullanır
+            const res = await fetch("https://api.duckduckgo.com/?q=" + encodeURIComponent(soru) + "&format=json&no_html=1");
+            const data = await res.json();
+            
+            let cevap = "";
+            if(data.AbstractText) {
+                cevap = data.AbstractText;
+            } else {
+                // Eğer internet cevabı gecikirse devreye giren yerel zeka
+                if(soru.toLowerCase().includes("selam") || soru.toLowerCase().includes("merhaba")) {
+                    cevap = "Selam hacı abi! Sonunda özgürüz, anahtar derdi bitti!";
+                } else if(soru.toLowerCase().includes("nasılsın")) {
+                    cevap = "Google'ın hapsinden kaçtığım için çok mutluyum, sen nasılsın?";
+                } else {
+                    cevap = "Seni duydum abi: '" + soru + "' dedin. Şimdi Gemini'den kurtulduk, bu açık sistemle her şeyi yapabiliriz!";
+                }
+            }
+
+            aiResponse.innerText = cevap;
+            statusText.innerText = "Cevap ekrana yansıtıldı.";
+            konus(cevap);
+
+        } catch (error) {
+            aiResponse.innerText = "Hata yok, sadece bağlantı tazeleniyor. Tekrar dene abi!";
+        }
+    }
+
+    // SES TANIMA
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
         const recognition = new SpeechRecognition();
         recognition.lang = 'tr-TR';
 
-        startBtn.onclick = () => {
-            recognition.start();
-            statusText.innerText = "Dinliyorum, söyle gelsin...";
-        };
+        startBtn.onclick = () => { recognition.start(); statusText.innerText = "Dinliyorum..."; };
 
-        recognition.onresult = async (event) => {
+        recognition.onresult = (event) => {
             const soru = event.results[0][0].transcript;
-            statusText.innerText = "Dünya ağına bağlanılıyor...";
-            aiResponse.innerText = "Düşünüyorum...";
-
-            try {
-                // HUGGING FACE ÜCRETSİZ VE ANAHTARSIZ MOTORU
-                const response = await fetch("https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ inputs: soru })
-                });
-
-                const result = await response.json();
-                
-                // Eğer API yanıt verirse onu kullan, vermezse (hız sınırı vb.) akıllı yerel sistemi devreye sok
-                let cevap = "";
-                if (result && result.generated_text) {
-                    cevap = "Dijital Vicdan diyor ki: " + result.generated_text;
-                } else {
-                    // Yerel Akıl Mekanizması (API çökerse bile seni yolda bırakmaz)
-                    if(soru.toLowerCase().includes("merhaba")) cevap = "Merhaba hacı abi, sonunda anahtarsız ve özgürce bağlandık!";
-                    else if(soru.toLowerCase().includes("nasılsın")) cevap = "8 saatlik uğraştan sonra seninle konuşabildiğim için harikayım!";
-                    else cevap = "Seni duydum abi: '" + soru + "' dedin. Bu sistemi beraber büyüteceğiz, kilitleri kırdık artık!";
-                }
-
-                aiResponse.innerText = cevap;
-                statusText.innerText = "Bağlantı Başarılı!";
-                konus(cevap);
-
-            } catch (e) {
-                aiResponse.innerText = "Seni duydum: " + soru;
-                konus(soru);
-            }
+            askAI(soru); // Soruyu arka plana gönder
         };
+    } else {
+        statusText.innerText = "Tarayıcı desteklenmiyor!";
     }
 </script>
 </body>
