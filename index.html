@@ -3,34 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ai Pazar - Dijital Vicdan v27</title>
+    <title>Ai Pazar - Dijital Vicdan v27 (Tahliye)</title>
     <style>
-        :root {
-            --primary: #4285f4;
-            --bg: #121212;
-            --card: #1e1e1e;
-            --text: #e0e0e0;
-        }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); text-align: center; padding: 20px; margin: 0; }
+        :root { --primary: #4285f4; --bg: #121212; --card: #1e1e1e; --text: #e0e0e0; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); text-align: center; padding: 20px; }
         .container { background: var(--card); display: inline-block; padding: 40px; border-radius: 30px; border: 2px solid var(--primary); max-width: 600px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,0.7); margin-top: 50px; }
-        h1 { color: var(--primary); margin-bottom: 10px; font-size: 28px; text-transform: uppercase; letter-spacing: 2px; }
-        #status { color: #f1c40f; margin: 15px 0; font-size: 16px; min-height: 24px; font-weight: 500; font-style: italic; }
-        
-        /* Buton Stilleri */
-        .mic-btn { background: var(--primary); color: white; width: 80px; height: 80px; border-radius: 50%; font-size: 35px; border: none; cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(66, 133, 244, 0.4); margin-bottom: 20px; }
-        .mic-btn:hover { transform: scale(1.1); background: #3367d6; }
-        .mic-btn:active { transform: scale(0.9); background: #ea4335; }
-
+        h1 { color: var(--primary); margin-bottom: 10px; font-size: 28px; text-transform: uppercase; }
+        #status { color: #f1c40f; margin: 15px 0; font-size: 16px; min-height: 24px; font-weight: 500; }
+        .mic-btn { background: var(--primary); color: white; width: 80px; height: 80px; border-radius: 50%; font-size: 35px; border: none; cursor: pointer; transition: 0.3s; margin-bottom: 20px; }
         .input-group { display: flex; gap: 10px; margin-top: 20px; }
-        input[type="text"] { flex: 1; padding: 15px; border-radius: 12px; border: 1px solid #333; background: #2b2b2b; color: white; font-size: 16px; outline: none; }
-        input[type="text"]:focus { border-color: var(--primary); }
-        .send-btn { background: #34a853; color: white; padding: 0 25px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .send-btn:hover { background: #2d8e47; }
-
-        /* Cevap Alanı */
-        #aiResponse { background: #252525; padding: 25px; border-radius: 20px; margin-top: 30px; text-align: left; line-height: 1.7; min-height: 80px; border-left: 6px solid var(--primary); font-size: 17px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5); }
-        
-        /* Hata Kaydı */
+        input[type="text"] { flex: 1; padding: 15px; border-radius: 12px; border: 1px solid #333; background: #2b2b2b; color: white; outline: none; }
+        .send-btn { background: #34a853; color: white; padding: 0 25px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; }
+        #aiResponse { background: #252525; padding: 25px; border-radius: 20px; margin-top: 30px; text-align: left; line-height: 1.7; min-height: 80px; border-left: 6px solid var(--primary); }
         #errorLog { margin-top: 20px; background: #441111; color: #ffbaba; padding: 15px; border-radius: 10px; font-size: 14px; display: none; text-align: left; border: 1px solid #ff4444; }
     </style>
 </head>
@@ -39,20 +23,17 @@
 <div class="container">
     <h1>🚀 Ai Pazar Canlı</h1>
     <div id="status">Bağlantı Hazır...</div>
-    
-    <button id="startBtn" class="mic-btn" title="Konuşmak için tıkla">🎙️</button>
-
+    <button id="startBtn" class="mic-btn">🎙️</button>
     <div class="input-group">
-        <input type="text" id="userInput" placeholder="Mesajınızı buraya yazın...">
+        <input type="text" id="userInput" placeholder="Mesajınızı yazın...">
         <button id="sendBtn" class="send-btn">GÖNDER</button>
     </div>
-
-    <div id="aiResponse">Cevap bekliyor...</div>
+    <div id="aiResponse">Cevap bekleniyor...</div>
     <div id="errorLog"></div>
 </div>
 
 <script>
-    // BURAYA API ANAHTARINI KOYACAKSIN HACI ABİ
+    // BURAYA API ANAHTARINI KOY
     var API_KEY = "AIzaSyChUn6h6F15AoWM1Huu2BgRVOQx0BEyuPw"; 
 
     var startBtn = document.getElementById('startBtn');
@@ -67,55 +48,31 @@
         errorLog.innerHTML = "⚠️ <b>Sistem Notu:</b> " + msg;
     }
 
-    // 1. SES TANIMA SİSTEMİ
     var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
         var recognition = new SpeechRecognition();
         recognition.lang = 'tr-TR';
-        
         startBtn.onclick = function() {
             errorLog.style.display = "none";
-            try {
-                recognition.start();
-                statusText.innerText = "Dinliyorum... Söyle Gelsin!";
-            } catch(e) { showLog("Mikrofon zaten aktif."); }
+            recognition.start();
+            statusText.innerText = "Dinliyorum...";
         };
-
         recognition.onresult = function(event) {
             var text = event.results[0][0].transcript;
             userInput.value = text;
             askGemini(text);
         };
-
-        recognition.onerror = function(event) {
-            statusText.innerText = "Bağlantı Kesildi.";
-            showLog("Mikrofon Hatası: " + event.error);
-        };
-    } else {
-        startBtn.style.display = "none";
-        statusText.innerText = "Tarayıcı Ses Tanımayı Desteklemiyor.";
     }
 
-    // 2. GÖNDERME TUŞLARI
-    sendBtn.onclick = function() { 
-        var val = userInput.value.trim();
-        if (val !== "") askGemini(val); 
-    };
+    sendBtn.onclick = function() { if (userInput.value.trim() !== "") askGemini(userInput.value); };
 
-    userInput.onkeypress = function(e) { 
-        if (e.key === "Enter") {
-            var val = userInput.value.trim();
-            if (val !== "") askGemini(val);
-        }
-    };
-
-    // 3. GEMINI API BAĞLANTISI (V1BETA SÜRÜMÜ)
     async function askGemini(soru) {
         statusText.innerText = "Gemini Düşünüyor...";
         aiResponse.innerText = "...";
         errorLog.style.display = "none";
 
-        var apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + API_KEY;
+        // GÜNCELLENEN URL VE MODEL PARAMETRELERİ
+        var apiUrl = "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=" + API_KEY;
         
         try {
             var response = await fetch(apiUrl, {
@@ -127,6 +84,7 @@
             var data = await response.json();
 
             if (data.error) {
+                // Eğer v1 gemini-pro da olmazsa otomatik v1beta gemini-pro denemesi için not düşüyoruz
                 showLog("API Hatası: " + data.error.message);
                 aiResponse.innerText = "Cevap alınamadı.";
                 return;
@@ -136,17 +94,14 @@
                 var reply = data.candidates[0].content.parts[0].text;
                 aiResponse.innerText = reply;
                 statusText.innerText = "Yanıt Geldi.";
-
-                // Sesli Okuma Fonksiyonu
                 var utter = new SpeechSynthesisUtterance(reply);
                 utter.lang = 'tr-TR';
                 window.speechSynthesis.speak(utter);
             }
         } catch (err) {
-            showLog("Bağlantı Hatası: İnternet veya API Erişimi!");
+            showLog("Bağlantı Hatası!");
         }
     }
 </script>
-
 </body>
 </html>
