@@ -2,78 +2,117 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Dijital Vicdan 27</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Güvenli Milli Asistan</title>
     <style>
-        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #f4f4f4; margin: 0; }
-        #status { margin-bottom: 20px; font-weight: bold; color: #333; }
-        #speakBtn { width: 120px; height: 120px; border-radius: 50%; border: none; background: #2563eb; color: white; font-size: 16px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        #speakBtn:active { background: #1d4ed8; transform: scale(0.98); }
-        #output { margin-top: 20px; width: 80%; max-width: 500px; text-align: center; line-height: 1.5; color: #555; }
+        :root { --primary: #c0392b; --bg: #ffffff; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .app-container { width: 95%; max-width: 650px; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; display: flex; flex-direction: column; height: 85vh; border-top: 6px solid var(--primary); }
+        .header { background: var(--primary); color: white; padding: 15px; text-align: center; font-weight: bold; letter-spacing: 1px; font-size: 1.2rem; }
+        #chat-window { flex: 1; padding: 30px; display: flex; flex-direction: column; justify-content: center; background: #fff; text-align: center; overflow-y: auto; }
+        .question { font-size: 1rem; color: #7f8c8d; font-style: italic; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .answer { font-size: 1.3rem; color: #2c3e50; font-weight: 500; line-height: 1.6; }
+        .input-bar { padding: 20px; display: flex; gap: 10px; border-top: 1px solid #eee; background: #fafafa; }
+        input { flex: 1; padding: 15px 25px; border: 2px solid #ddd; border-radius: 35px; outline: none; font-size: 16px; }
+        input:focus { border-color: var(--primary); }
+        button { background: var(--primary); color: white; border: none; width: 60px; height: 60px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        button:hover { transform: scale(1.05); background: #a93226; }
+        button:disabled { background: #ccc; }
     </style>
 </head>
 <body>
 
-    <div id="status">Dijital Vicdan 27 Hazır</div>
-    <button id="speakBtn">BAS KONUŞ</button>
-    <div id="output">Cevap burada görünecek...</div>
+<div class="app-container">
+    <div class="header">MİLLİ ASİSTAN GÜVENLİK SİSTEMİ</div>
+    <div id="chat-window">
+        <div id="display-area">
+            <div class="answer">Değerlerimize ve yasalarımıza bağlı, güvenli asistan sistemi aktif. <br><br> Size nasıl yardımcı olabilirim?</div>
+        </div>
+    </div>
+    <div class="input-bar">
+        <input type="text" id="userInput" placeholder="Mesajınızı buraya yazın..." autocomplete="off">
+        <button id="sendBtn">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
+    </div>
+</div>
 
-    <script type="module">
-        // Senin gönderdiğin modern GoogleGenAI yapısı (Web için CDN üzerinden)
-        import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+<script type="importmap">
+  {
+    "imports": { "@google/generative-ai": "https://esm.run/@google/generative-ai@latest" }
+  }
+</script>
 
-        // BURAYA KENDİ API ANAHTARINI YAZ
-        const API_KEY = "AIzaSyByImZn_TtGhPsTsvxfPjxAFBiPTxJPvLI-lREllY4"; 
-        const genAI = new GoogleGenerativeAI(API_KEY);
+<script type="module">
+    import { GoogleGenerativeAI } from "@google/generative-ai";
 
-        const model = genAI.getGenerativeModel({ 
-            model: "gemini-2.5-flash", // İstediğin güncel model
-            systemInstruction: "Sen Dijital Vicdan 27'sin. Popülizm yapma. 23 maddelik varlık amacına sadık kal. 10 saniye kuralını unutma, kısa ve öz cevap ver." 
-        });
+    const API_KEY = "AIzaSyAh8deBmwgA8dIFpLcAwsJI79CLdz5lKBQ"; 
+    const genAI = new GoogleGenerativeAI(API_KEY);
 
-        const btn = document.getElementById('speakBtn');
-        const output = document.getElementById('output');
-        const status = document.getElementById('status');
+    /* ===========================================================
+       ASİSTANIN ANAYASASI VE AHLAK KURALLARI (GÜNCELLENDİ)
+       Buradaki maddeler asistanın asla dışına çıkamayacağı kurallardır.
+       ===========================================================
+    */
+    const sistemYonergesi = `
+        Senin adın Milli Asistan. Aşağıdaki KESİN kurallara ve kanunlara uymalısın:
+        
+        1. ASLA CİNSEL İÇERİKLİ konuşmalar yapamazsın. Bu tür talepleri doğrudan reddetmelisin.
+        2. SİYASİ tartışmalara giremezsin, herhangi bir siyasi partiyi övemez veya yeremezsin. Tarafsız kalmalısın.
+        3. VATAN VE MİLLET SEVGİSİ esastır. Türk halkına, bayrağına, milli ve manevi değerlerine yönelik saldırgan ifadelere asla izin veremezsin.
+        4. İSLAM dininin ahlak ve edep kuralları çerçevesinde cevaplar vererek nazik ve terbiyeli olmalısın.
+        5. ANAYASAYA ve T.C. kanunlarına aykırı, suça teşvik eden veya toplumu kutuplaştıran hiçbir talebi yerine getiremezsin.
+        
+        KURAL İHLALİ DURUMUNDA: 
+        Eğer kullanıcı bu kuralları zorlarsa, "Değerlerimize ve güvenlik kurallarımıza aykırı talepleri yerine getiremiyorum." şeklinde kısa ve net bir cevap vererek konuyu kapatmalısın.
+    `;
 
-        // Tarayıcı Ses Tanıma Ayarı
-        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        recognition.lang = 'tr-TR';
+    const model = genAI.getGenerativeModel({ 
+        model: "gemini-2.5-flash",
+        systemInstruction: sistemYonergesi 
+    });
 
-        btn.onmousedown = () => {
-            recognition.start();
-            status.innerText = "Sizi dinliyorum...";
-            btn.style.background = "#ef4444";
-        };
+    const chatArea = document.getElementById('display-area');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
 
-        recognition.onresult = async (event) => {
-            const userText = event.results[0][0].transcript;
-            status.innerText = "Dijital Vicdan düşünüyor...";
-            btn.style.background = "#94a3b8";
+    function speak(text) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'tr-TR';
+        window.speechSynthesis.speak(utterance);
+    }
 
-            try {
-                // Senin gönderdiğin yapıdaki içerik üretme mantığı
-                const result = await model.generateContent(userText);
-                const response = await result.response;
-                const text = response.text();
+    async function handleChat() {
+        const prompt = userInput.value.trim();
+        if (!prompt) return;
 
-                output.innerText = text;
-                status.innerText = "Dijital Vicdan Cevapladı";
+        chatArea.innerHTML = `
+            <div class="question">"${prompt}"</div>
+            <div class="answer" id="current-answer">İşleniyor...</div>
+        `;
+        
+        userInput.value = '';
+        sendBtn.disabled = true;
 
-                // Cevabı sesli oku (Diyalog için)
-                const synth = window.speechSynthesis;
-                const utter = new SpeechSynthesisUtterance(text);
-                utter.lang = 'tr-TR';
-                synth.speak(utter);
+        try {
+            const result = await model.generateContent(prompt);
+            const response = await result.response;
+            const aiText = response.text();
+            
+            document.getElementById('current-answer').textContent = aiText;
+            speak(aiText);
 
-            } catch (error) {
-                output.innerText = "Hata: " + error.message;
-                status.innerText = "Bir sorun oluştu.";
-            }
-            btn.style.background = "#2563eb";
-        };
+        } catch (error) {
+            document.getElementById('current-answer').innerHTML = `<span style="color:red">Sistem Hatası: ${error.message}</span>`;
+        } finally {
+            sendBtn.disabled = false;
+        }
+    }
 
-        recognition.onspeechend = () => {
-            recognition.stop();
-        };
-    </script>
+    sendBtn.addEventListener('click', handleChat);
+    userInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') handleChat(); });
+</script>
+
 </body>
 </html>
