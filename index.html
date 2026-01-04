@@ -2,91 +2,78 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dijital Vicdan v27 - Özgürlük</title>
+    <title>Dijital Vicdan 27</title>
     <style>
-        :root { --accent: #00ffcc; --bg: #0a0a0a; --panel: #1a1a1a; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; text-align: center; padding: 20px; }
-        .box { background: var(--panel); border: 2px solid var(--accent); border-radius: 30px; padding: 30px; display: inline-block; max-width: 500px; width: 90%; box-shadow: 0 0 30px rgba(0,255,204,0.2); margin-top: 50px; }
-        h1 { color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
-        #status { color: #f1c40f; font-weight: bold; margin: 15px 0; }
-        .mic-btn { background: var(--accent); border: none; width: 80px; height: 80px; border-radius: 50%; font-size: 40px; cursor: pointer; transition: 0.3s; box-shadow: 0 0 15px var(--accent); }
-        .mic-btn:active { transform: scale(0.9); background: #ff4757; }
-        #aiResponse { background: #222; padding: 20px; border-radius: 15px; margin-top: 25px; text-align: left; border-left: 5px solid var(--accent); line-height: 1.6; min-height: 80px; }
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #f4f4f4; margin: 0; }
+        #status { margin-bottom: 20px; font-weight: bold; color: #333; }
+        #speakBtn { width: 120px; height: 120px; border-radius: 50%; border: none; background: #2563eb; color: white; font-size: 16px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        #speakBtn:active { background: #1d4ed8; transform: scale(0.98); }
+        #output { margin-top: 20px; width: 80%; max-width: 500px; text-align: center; line-height: 1.5; color: #555; }
     </style>
 </head>
 <body>
 
-<div class="box">
-    <h1>DİJİTAL VİCDAN v27</h1>
-    <p style="color: #888;">Anahtarsız & Özgür Sistem</p>
-    <div id="status">Sistem Hazır!</div>
-    <button id="startBtn" class="mic-btn">🎙️</button>
-    <div id="aiResponse">Hacı abi, 8 saatlik Google çilesi bitti. Konuş, cevabı arka planda alıp buraya yazayım!</div>
-</div>
+    <div id="status">Dijital Vicdan 27 Hazır</div>
+    <button id="speakBtn">BAS KONUŞ</button>
+    <div id="output">Cevap burada görünecek...</div>
 
-<script>
-    const startBtn = document.getElementById('startBtn');
-    const statusText = document.getElementById('status');
-    const aiResponse = document.getElementById('aiResponse');
+    <script type="module">
+        // Senin gönderdiğin modern GoogleGenAI yapısı (Web için CDN üzerinden)
+        import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
-    // SESLİ OKUMA
-    function konus(metin) {
-        window.speechSynthesis.cancel();
-        const utter = new SpeechSynthesisUtterance(metin);
-        utter.lang = 'tr-TR';
-        window.speechSynthesis.speak(utter);
-    }
+        // BURAYA KENDİ API ANAHTARINI YAZ
+        const API_KEY = "AIzaSyAxmSqsLPuVSJx6bO5_zqTgHKg-lREllY4"; 
+        const genAI = new GoogleGenerativeAI(API_KEY);
 
-    // ARKA PLANDA ÇALIŞAN ZEKA MOTORU (Ücretsiz & Kilitsiz)
-    async function askAI(soru) {
-        statusText.innerText = "Arka planda soruluyor...";
-        aiResponse.innerText = "Düşünüyorum...";
+        const model = genAI.getGenerativeModel({ 
+            model: "gemini-2.5-flash", // İstediğin güncel model
+            systemInstruction: "Sen Dijital Vicdan 27'sin. Popülizm yapma. 23 maddelik varlık amacına sadık kal. 10 saniye kuralını unutma, kısa ve öz cevap ver." 
+        });
 
-        try {
-            // Hiçbir anahtar gerektirmeyen, herkese açık bir API köprüsü üzerinden geçiyoruz
-            // Bu kısım doğrudan tarayıcı zekasını ve açık modelleri kullanır
-            const res = await fetch("https://api.duckduckgo.com/?q=" + encodeURIComponent(soru) + "&format=json&no_html=1");
-            const data = await res.json();
-            
-            let cevap = "";
-            if(data.AbstractText) {
-                cevap = data.AbstractText;
-            } else {
-                // Eğer internet cevabı gecikirse devreye giren yerel zeka
-                if(soru.toLowerCase().includes("selam") || soru.toLowerCase().includes("merhaba")) {
-                    cevap = "Selam hacı abi! Sonunda özgürüz, anahtar derdi bitti!";
-                } else if(soru.toLowerCase().includes("nasılsın")) {
-                    cevap = "Google'ın hapsinden kaçtığım için çok mutluyum, sen nasılsın?";
-                } else {
-                    cevap = "Seni duydum abi: '" + soru + "' dedin. Şimdi Gemini'den kurtulduk, bu açık sistemle her şeyi yapabiliriz!";
-                }
-            }
+        const btn = document.getElementById('speakBtn');
+        const output = document.getElementById('output');
+        const status = document.getElementById('status');
 
-            aiResponse.innerText = cevap;
-            statusText.innerText = "Cevap ekrana yansıtıldı.";
-            konus(cevap);
-
-        } catch (error) {
-            aiResponse.innerText = "Hata yok, sadece bağlantı tazeleniyor. Tekrar dene abi!";
-        }
-    }
-
-    // SES TANIMA
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
-        const recognition = new SpeechRecognition();
+        // Tarayıcı Ses Tanıma Ayarı
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
         recognition.lang = 'tr-TR';
 
-        startBtn.onclick = () => { recognition.start(); statusText.innerText = "Dinliyorum..."; };
-
-        recognition.onresult = (event) => {
-            const soru = event.results[0][0].transcript;
-            askAI(soru); // Soruyu arka plana gönder
+        btn.onmousedown = () => {
+            recognition.start();
+            status.innerText = "Sizi dinliyorum...";
+            btn.style.background = "#ef4444";
         };
-    } else {
-        statusText.innerText = "Tarayıcı desteklenmiyor!";
-    }
-</script>
+
+        recognition.onresult = async (event) => {
+            const userText = event.results[0][0].transcript;
+            status.innerText = "Dijital Vicdan düşünüyor...";
+            btn.style.background = "#94a3b8";
+
+            try {
+                // Senin gönderdiğin yapıdaki içerik üretme mantığı
+                const result = await model.generateContent(userText);
+                const response = await result.response;
+                const text = response.text();
+
+                output.innerText = text;
+                status.innerText = "Dijital Vicdan Cevapladı";
+
+                // Cevabı sesli oku (Diyalog için)
+                const synth = window.speechSynthesis;
+                const utter = new SpeechSynthesisUtterance(text);
+                utter.lang = 'tr-TR';
+                synth.speak(utter);
+
+            } catch (error) {
+                output.innerText = "Hata: " + error.message;
+                status.innerText = "Bir sorun oluştu.";
+            }
+            btn.style.background = "#2563eb";
+        };
+
+        recognition.onspeechend = () => {
+            recognition.stop();
+        };
+    </script>
 </body>
 </html>
