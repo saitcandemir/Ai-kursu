@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GY-61 | Milli Zeka Ağı</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body oncontextmenu="return false;">
+
+    <header>
+        <h1>GY-61 BİRLEŞİK SİSTEM</h1>
+        <p>Trabzonspor Ruhuyla Milli Teknoloji</p>
+    </header>
+
+    <nav style="display: flex; background: #1a1a1a; position: sticky; top: 0; z-index: 100;">
+        <button onclick="acPage('vitrin')" class="tab-btn active" id="btn-vitrin">VİTRİN</button>
+        <button onclick="acPage('uye')" class="tab-btn" id="btn-uye">ÜYE PANELİ</button>
+        <button onclick="acPage('admin')" class="tab-btn" id="btn-admin">SÜPER ADMİN</button>
+    </nav>
+
+    <div class="container">
+        
+        <section id="vitrin" class="page active">
+            <div class="card">
+                <h3>🤖 Milli Asistan</h3>
+                <div id="chatBox">
+                    <div class="msg bot">Selamun Aleyküm! Ben GY-61. Size nasıl yardımcı olabilirim?</div>
+                </div>
+                <div class="input-area">
+                    <button class="mic-btn" onclick="recognition.start()">🎤</button>
+                    <input type="text" id="userInput" placeholder="Sorunuzu buraya yazın...">
+                    <button onclick="gonder()">SOR</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="uye" class="page">
+            <div class="card">
+                <h3>✍️ Yavruyu Eğit</h3>
+                <p>İşletmenize özel bilgileri buraya girin:</p>
+                <textarea id="uyeData" style="width:100%; height:150px; padding:10px; border-radius:8px;" placeholder="Örn: Hafta sonları kapalıyız..."></textarea>
+                <button onclick="saveUyeData()" style="width:100%; margin-top:10px; background:var(--mavi);">EĞİTİMİ KAYDET</button>
+            </div>
+        </section>
+
+        <section id="admin" class="page">
+            <div class="card" style="border-left-color: gold;">
+                <h3>🚀 Sistem Aktivasyonu</h3>
+                <p>API Anahtarını buraya girerek tüm yavruları ateşle:</p>
+                <input type="password" id="masterKey" placeholder="Gemini API Key...">
+                <button onclick="atesleSistemi()" style="width:100%; margin-top:10px; background:var(--bordo);">SİSTEMİ ATEŞLE</button>
+                <hr>
+                <p>Günlük Kullanım Sayacı: <b id="usageCount">0</b> / 20</p>
+                <button onclick="localStorage.setItem('gy61_sayac', 0); location.reload();" style="font-size:10px;">Sıfırla</button>
+            </div>
+        </section>
+
+    </div>
+
+    <footer class="footer-bar">
+        <button class="f-btn" style="background:#25D366;" onclick="window.location.href='tel:0532'">📞 HEMEN ARA</button>
+        <button class="f-btn" style="background:#1a1a1a; color:var(--mavi);">⚙️ SİSTEM KUR</button>
+    </footer>
+
+    <script src="mufredat.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Sekme Değiştirme Fonksiyonu
+        function acPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            document.getElementById('btn-' + pageId).classList.add('active');
+        }
+
+        // Form Fonksiyonları
+        function saveUyeData() {
+            localStorage.setItem('gy61_uye_data', document.getElementById('uyeData').value);
+            alert("Bilgiler kaydedildi!");
+        }
+
+        function atesleSistemi() {
+            localStorage.setItem('gy61_key', document.getElementById('masterKey').value);
+            alert("Sistem Global Zekaya Bağlandı!");
+        }
+
+        // Vitrin Gönderim Motoru
+        async function gonder() {
+            const inp = document.getElementById('userInput');
+            const box = document.getElementById('chatBox');
+            if(!inp.value) return;
+            box.innerHTML += `<div class="msg user">${inp.value}</div>`;
+            const cevap = await YavruZeka.sor(inp.value);
+            box.innerHTML += `<div class="msg bot">${cevap}</div>`;
+            inp.value = "";
+            box.scrollTop = box.scrollHeight;
+        }
+
+        // Başlangıç Değerleri
+        document.getElementById('usageCount').innerText = localStorage.getItem('gy61_sayac') || "0";
+        document.getElementById('uyeData').value = localStorage.getItem('gy61_uye_data') || "";
+    </script>
+
+    <style>
+        /* index'e özel ek sekmeler */
+        .page { display: none; }
+        .page.active { display: block; }
+        .tab-btn { flex: 1; padding: 15px; border: none; background: transparent; color: #888; font-weight: bold; cursor: pointer; border-bottom: 3px solid transparent; }
+        .tab-btn.active { color: var(--mavi); border-bottom-color: var(--mavi); }
+    </style>
+</body>
+</html>
