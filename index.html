@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+    <header><h1>GEMİNİ YAVRUSU 61</h1></header>
+    <div class="container">
+        <div id="chatBox" style="display:flex; flex-direction:column;"></div>
+        <div style="display:flex; gap:10px;">
+            <input type="text" id="inp" style="flex:1; padding:10px;" placeholder="Sorunuzu sorun...">
+            <button onclick="gonder()">GÖNDER</button>
+        </div>
+    </div>
+    <footer class="footer-viral">
+        <button class="btn-wa">📞 HEMEN ARA</button>
+        <button class="btn-sys">⚙️ KENDİ SİSTEMİNİ KUR</button>
+    </footer>
+    <script src="script.js"></script>
+    <script>
+        async function gonder() {
+            const i = document.getElementById('inp');
+            const box = document.getElementById('chatBox');
+            box.innerHTML += `<div class="msg user">${i.value}</div>`;
+            const cevap = await YavruZeka.sor(i.value);
+            box.innerHTML += `<div class="msg bot">${cevap}</div>`;
+            i.value = "";
+            box.scrollTop = box.scrollHeight;
+        }
+    </script>
+</body>
+</html>
